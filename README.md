@@ -11,7 +11,7 @@ Notes:
 
 	b) sema.h contains an algorithm using semaphores (c++20) where the critical section is divided into two parts. This is already much faster than mut_cond.h (about 80 times faster, timed with the system clock and 100,000 loops for each thread).
   
-	c) max_threading attempts to improve the efficiency even more by utilising all available threads. It uses semaphores and can be easily modified to use fine-grain locks (currently only uses semaphores, c++20). This is even faster than sema.h (about 110 times, using the same 100,000 loops and timed with system clock)
+	c) max_threading attempts to improve the efficiency even more by utilising all available threads. It uses semaphores and can be easily modified to use fine-grain locks (currently only uses semaphores, c++20). This is even faster than sema.h (about 110 times, using the same 100,000 loops and timed with the system clock)
   
 3. The main.cpp file contains the following:
    
