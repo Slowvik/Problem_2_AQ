@@ -7,8 +7,12 @@ Compile with:
 Notes:
 1. 3 different algorithms are presented as follows (all called with the sample given in the question):
   a) mut_cond.h contains an algorithm using mutexes and condition_variables. These are c++11 features. The algorithm ends up running sequantially for the most part.
+
   b) sema.h contains an algorithm using semaphores (c++20) where the critical section is divided into two parts. This is already much faster than mut_cond.h (about 80 times faster, times with system clock and 100,000 loops for each thread).
+  
   c) max_threading attempts to improve the efficiency even more by utilising all availabl;e threads. It uses semaphores and can be easily modified to use fine-grain locks (currently only uses semaphores, c++20). This is even faster than sema.h (about 110 times, using the same 100,000 loops and timed with system clock)
-2. The main.cpp file contains the following:
+  
+3. The main.cpp file contains the following:
    a) the 3 algorithms are initialised
+   
    b) vectors of threads (4) are created, joined and timed one after the other. For each algorithm, the time is calculated before the threads are created and after the threads are joined to maintain synchronisation with the main thread. As per the c++11 memory model which guranatees sequential execution of code, the times thus measured should be accurate.
