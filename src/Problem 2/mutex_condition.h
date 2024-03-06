@@ -13,6 +13,8 @@ Possible modification if the calculations are time-consuming:
     > If two or more threads have calculated substrings ready, some sort of check needs to be in place to see ho prints first
     > Printing will still be sequential (using the same condition variable), but the calculation of substring can possibly be done in advance by a random thread
 */
+#ifndef MUTEX_COND_H_
+#define MUTEX_COND_H_
 
 #include <iostream>
 #include <thread>
@@ -22,12 +24,11 @@ Possible modification if the calculations are time-consuming:
 #include <vector>
 #include <atomic>
 
-namespace printer
+namespace mut_cond
 {
     std::mutex main_mutex;
     std::condition_variable main_cond;
 
-    std::vector<std::thread> t;
     int thread_count;
     std::vector<bool> turn;    
     std::atomic<int> start_index=0;//start_index will be the first char of new substring, 1+ last char of previous substring
@@ -41,10 +42,10 @@ namespace printer
     {
         std::string subs;
         int count = 0;
-        int pos = printer::start_index;
+        int pos = mut_cond::start_index;
         while (count<char_count)
         {
-            subs+=printer::main_string[pos%printer::string_size];
+            subs+=mut_cond::main_string[pos%mut_cond::string_size];
             pos++;
             count++; 
         }
@@ -54,7 +55,7 @@ namespace printer
     //Calculates starting position of next substring
     void calc_next_start_index()
     {
-        printer::start_index = (printer::start_index+printer::char_count)%printer::string_size;
+        mut_cond::start_index = (mut_cond::start_index+mut_cond::char_count)%mut_cond::string_size;
     }
 
 
@@ -63,23 +64,29 @@ namespace printer
     {
         while(1)
         {
+            //ENTRY SECTION
+
             //acquire the mutex
             std::unique_lock<std::mutex> thread_lock(main_mutex);
 
             //condition_variable atomically releases the mutex till predicate is met (till it's turn comes)
             main_cond.wait(thread_lock, [&]{return turn[index];});
 
+            //CRITICAL SECTION
+
             //Printing the substring
-            std::cout<<printer::return_substring()<<std::endl; 
+            std::cout<<mut_cond::return_substring()<<std::endl; 
 
             //calculate start index for next thread
-            printer::calc_next_start_index();           
+            mut_cond::calc_next_start_index();           
 
             //Change own turn[index] to false;
             turn[index] = false;
 
             //Change next thread's turn[(index+1)%thread_count] to true - results in threads being called sequentially.
-            turn[(index+1)%printer::thread_count] = true;
+            turn[(index+1)%mut_cond::thread_count] = true;
+
+            //EXIT SECTION
 
             //release the mutex
             thread_lock.unlock();
@@ -90,61 +97,4 @@ namespace printer
     }
 }
 
-
-
-
-int main(int argc, char* argv[])
-{
-    std::string s = argv[1];
-    int c_count = atoi(argv[2]);
-    int t_count = atoi(argv[3]);
-
-    std::cout<<"Using "<<t_count<<" threads to print "<<s<<" alternatively in sets of "<<c_count<<" chars"<<std::endl;
-
-    printer::main_string = s;
-    printer::char_count = c_count;
-    printer::string_size = s.size();
-    printer::thread_count = t_count;
-
-    if(s=="")
-    {
-        std::cout<<"Please enter a non-empty string"<<std::endl;
-        return 1;
-    }
-    if(c_count<1)
-    {
-        std::cout<<"Please enter a valid character count (>=1)"<<std::endl;
-        return 1;
-    }
-    if(t_count<1)
-    {
-        std::cout<<"Please enter a valid number of threads (>=1)"<<std::endl;
-        return 1;
-    }
-
-    //vector of threads
-    std::vector<std::thread> thread_vector;
-
-    //Initialise the turns: at start, only thread[0] should be allowed to print.
-    printer::turn.push_back(true);
-    for(int i=1; i<t_count; i++)
-    {
-        printer::turn.push_back(false);
-    }
-
-    //Initialise the threads
-    for(int i = 0; i<t_count;i++)
-    {
-        std::thread th(printer::thread_runner, i); //Initialise a thread with a thread_runner + thread ID (basically its array index)
-        thread_vector.push_back(move(th)); //Copy constructor of std::thread is deleted, have to use move() instead
-    }
-
-    //join the threads
-    for(int i = 0; i<t_count; i++)
-    {
-        thread_vector[i].join();
-    }
-
-    system("PAUSE");
-    return 0;
-}
+#endif
