@@ -1,29 +1,24 @@
-#include "mutex_condition.h"
-#include "semaphore_cpp20.h"
+/*
+
+*/
+
+#include "mut_cond.h"
+#include "sema.h"
+#include "max_threading.h"
 #include <iostream>
 #include <thread>
 #include <vector>
 #include <string>
+#include <chrono>
 
 int main(int argc, char* argv[])
 {
+    int n_loops = 100000;
     std::string s = argv[1];
     int c_count = atoi(argv[2]);
     int t_count = atoi(argv[3]);
 
     std::cout<<"Using "<<t_count<<" threads to print "<<s<<" alternatively in sets of "<<c_count<<" chars"<<std::endl;
-
-    mut_cond::main_string = s;
-    mut_cond::char_count = c_count;
-    mut_cond::string_size = s.size();
-    mut_cond::thread_count = t_count;
-
-    sema::main_string = s;
-    sema::char_count = c_count;
-    sema::start_index = -c_count;
-    sema::string_size = s.size();
-    sema::thread_count = t_count;
-    //sema::print_sema(t_count);
 
     if(s=="")
     {
@@ -41,31 +36,61 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+    //Initialising the different algorithms
+    mut_cond::init(s, c_count, t_count, n_loops);
+    sema::init(s, c_count, t_count, n_loops);
+    max_threading::init(s, c_count, t_count, n_loops);
+
+
     //vector of threads
-    std::vector<std::thread> thread_vector;
+    std::vector<std::thread> thread_vector_mut_cond;
+    std::vector<std::thread> thread_vector_sema;
+    std::vector<std::thread> thread_vector_max_threading;
 
-    //Initialise the turns: at start, only thread[0] should be allowed to print.
-    // mut_cond::turn.push_back(true);
-    // for(int i=1; i<t_count; i++)
-    // {
-    //     mut_cond::turn.push_back(false);
-    // }
-
-    //std::cout<<"Thread count: "<<sema::thread_count<<std::endl;
-
-    //Initialise the threads
+    //create the threads and time them for 1000 loops each
+    auto startTimeMutCond = std::chrono::high_resolution_clock::now();
     for(int i = 0; i<t_count;i++)
     {
-        //std::thread th(mut_cond::thread_runner, i); //running code with mutex and cv
-        std::thread th(sema::thread_runner, i); //running code with semaphore
-        thread_vector.push_back(move(th)); //Copy constructor of std::thread is deleted, have to use move() instead
+        std::thread th(mut_cond::thread_runner, i); //running code with mutex and cv       
+        thread_vector_mut_cond.push_back(move(th)); //Copy constructor of std::thread is deleted, have to use move() instead
     }
-
-    //join the threads
     for(int i = 0; i<t_count; i++)
     {
-        thread_vector[i].join();
+        thread_vector_mut_cond[i].join();
     }
+    auto endTimeMutCond = std::chrono::high_resolution_clock::now();
+    
+
+    auto startTimeSema = std::chrono::high_resolution_clock::now();
+    for(int i = 0; i<t_count;i++)
+    {
+        std::thread th(sema::thread_runner, i); //running code with semaphore
+        thread_vector_sema.push_back(move(th)); //Copy constructor of std::thread is deleted, have to use move() instead
+    }
+    for(int i = 0; i<t_count; i++)
+    {
+        thread_vector_sema[i].join();
+    }
+    auto endTimeSema = std::chrono::high_resolution_clock::now();
+    
+    auto startTimeMaxThreading = std::chrono::high_resolution_clock::now();
+    for(int i = 0; i<t_count;i++)
+    {
+        std::thread th(max_threading::thread_runner, i);//running code with max_threading
+        thread_vector_max_threading.push_back(move(th)); //Copy constructor of std::thread is deleted, have to use move() instead
+    }
+    for(int i = 0; i<t_count; i++)
+    {
+        thread_vector_max_threading[i].join();
+    }
+    auto endTimeMaxThreading = std::chrono::high_resolution_clock::now();
+
+    std::cout<<"\n\n\n\n";
+
+    std::cout<<"Time taken by mut_cond is "<<std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(endTimeMutCond - startTimeMutCond).count()<<" milliseconds"<<std::endl;
+    std::cout<<"Time taken by sema is "<<std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(endTimeSema - startTimeSema).count()<<" milliseconds"<<std::endl;
+    std::cout<<"Time taken by max_threading is "<<std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(endTimeMaxThreading - startTimeMaxThreading).count()<<" milliseconds"<<std::endl;
+
 
     system("PAUSE");
     return 0;

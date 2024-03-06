@@ -16,19 +16,28 @@
 
 namespace sema
 {
+    int num_loops = 0;
     std::string main_string;
+    int string_size; 
     int char_count;
     int thread_count;
         
-    int start_index;//start_index will be the first char of new substring, 1+ last char of previous substring
-    int string_size;   
-    
+    int start_index;//start_index will be the first char of new substring, 1+ last char of previous substring   
     std::queue<int> start_index_queue;    
 
     std::binary_semaphore print_sema(1);
     std::binary_semaphore calc_sema(1);
 
-
+    void init(std::string s, int c_count, int t_count, int n=0)
+    {
+        sema::num_loops = n;
+        sema::main_string = s;
+        sema::string_size = s.size();
+        sema::char_count = c_count;
+        sema::thread_count = t_count;
+        sema::start_index_queue.push(0);
+    }
+    
     //Extracts a substring based on user-given parameters
     std::string return_substring(int index)
     {
@@ -53,7 +62,8 @@ namespace sema
 
     void thread_runner(int index)
     {
-        while(1)
+        int count=0;
+        while(count++<num_loops)
         {
             //CRITICAL SECTION 1
             /*            
@@ -61,7 +71,7 @@ namespace sema
             */
             if(sema::print_sema.try_acquire())
             {                
-                std::cout<<"In print section with thread: "<<index<<std::endl;
+                //std::cout<<"In print section with thread: "<<index<<std::endl;
                 if(!sema::start_index_queue.empty())
                 {
                     std::cout<<sema::return_substring(sema::start_index_queue.front())<<std::endl;
@@ -79,7 +89,7 @@ namespace sema
             */
             if(sema::calc_sema.try_acquire())
             {
-                std::cout<<"In calc section with thread: "<<index<<std::endl;  
+                //std::cout<<"In calc section with thread: "<<index<<std::endl;  
                 sema::calc_next_start_index();
 
                 sema::calc_sema.release();

@@ -26,16 +26,33 @@ Possible modification if the calculations are time-consuming:
 
 namespace mut_cond
 {
+    int num_loops = 1000000;
+    std::string main_string;
+    int string_size;
+    int char_count;
+    int thread_count;
+
     std::mutex main_mutex;
     std::condition_variable main_cond;
-
-    int thread_count;
+    
     std::vector<bool> turn;    
     std::atomic<int> start_index=0;//start_index will be the first char of new substring, 1+ last char of previous substring
 
-    int string_size;
-    std::string main_string;
-    int char_count;
+    void init(std::string s, int c_count, int t_count, int n=1000000)
+    {
+        mut_cond::num_loops = n;
+        mut_cond::main_string = s;
+        mut_cond::string_size = s.size();
+        mut_cond::char_count = c_count;
+        mut_cond::thread_count = t_count;
+
+        //Initialise the turns: at start, only thread[0] should be allowed to print.
+        mut_cond::turn.push_back(true);
+        for(int i=1; i<t_count; i++)
+        {
+            mut_cond::turn.push_back(false);
+        }
+    } 
 
     //Extracts a substring sequentially based on user-given parameters
     std::string return_substring()
@@ -62,7 +79,8 @@ namespace mut_cond
     //thread_runner currently prints the substrings in an infinite loop
     void thread_runner(int index)
     {
-        while(1)
+        int count=0;
+        while(count++<num_loops)
         {
             //ENTRY SECTION
 
