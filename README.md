@@ -21,7 +21,7 @@ Notes:
 
 4. When tested with different loop sizes, the following conclusions were made:
 
-	a) the time complexity of mut_cond.h increases linearly (O(N) with number of loops (it takes ~10x longer if it runs 10x more times)
+	a) the time complexity of mut_cond.h increases linearly (O(N)) with number of loops as N (it takes ~10x longer if it runs 10x more times).
 
 	b) the time complexity of sema.h is less than O(N). It increases about ~3x if number of loops is increased 10x. This suggests it might be of the order of O(log(N)).
 
