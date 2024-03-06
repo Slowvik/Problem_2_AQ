@@ -47,7 +47,7 @@ namespace printer
             subs+=printer::main_string[pos%printer::string_size];
             pos++;
             count++; 
-            }
+        }
         return subs;
     }
 
@@ -63,12 +63,11 @@ namespace printer
     {
         while(1)
         {
+            //acquire the mutex
             std::unique_lock<std::mutex> thread_lock(main_mutex);
 
+            //condition_variable atomically releases the mutex till predicate is met (till it's turn comes)
             main_cond.wait(thread_lock, [&]{return turn[index];});
-
-            //Perform all the work, calculation + printing
-            std::cout<<"Printing from thread "<<index+1<<std::endl;
 
             //Printing the substring
             std::cout<<printer::return_substring()<<std::endl; 
@@ -79,7 +78,7 @@ namespace printer
             //Change own turn[index] to false;
             turn[index] = false;
 
-            //Change next thread's turn[(index+1)%thread_count] to true;
+            //Change next thread's turn[(index+1)%thread_count] to true - results in threads being called sequentially.
             turn[(index+1)%printer::thread_count] = true;
 
             //release the mutex
@@ -126,7 +125,7 @@ int main(int argc, char* argv[])
     //vector of threads
     std::vector<std::thread> thread_vector;
 
-    //Initialise the turns: at start, thread[0] should be allowed to print.
+    //Initialise the turns: at start, only thread[0] should be allowed to print.
     printer::turn.push_back(true);
     for(int i=1; i<t_count; i++)
     {
@@ -136,8 +135,8 @@ int main(int argc, char* argv[])
     //Initialise the threads
     for(int i = 0; i<t_count;i++)
     {
-        std::thread th(printer::thread_runner, i);
-        thread_vector.push_back(move(th));
+        std::thread th(printer::thread_runner, i); //Initialise a thread with a thread_runner + thread ID (basically its array index)
+        thread_vector.push_back(move(th)); //Copy constructor of std::thread is deleted, have to use move() instead
     }
 
     //join the threads
