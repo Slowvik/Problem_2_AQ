@@ -18,3 +18,9 @@ Notes:
 	a) the 3 algorithms are initialised
    
 	b) vectors of threads (4) are created, joined and timed one after the other. For each algorithm, the time is calculated before the threads are created and after the threads are joined to maintain synchronisation with the main thread. As per the c++11 memory model which guranatees sequential execution of code, the times thus measured should be accurate.
+
+4. When tested with different loop sizes, the following conclusions were made:
+
+	a) the time complexity of mut_cond.h increases linearly (O(N) with number of loops (it takes ~10x longer if it runs 10x more times)
+	b) the time complexity of sema.h is less than O(N). It increases about ~3x if number of loops is increased 10x. This suggests it might be of the order of O(log(N)).
+	c) The time complexity of max_threading.h is again about O(N) where N is the number of loops each thread has to run for (10x increase when N is increased by 10x). However, it is still much faster than both the other algorithms.
