@@ -7,7 +7,7 @@ Compile with:
 Notes:
 1. 3 different algorithms are presented as follows (all called with the sample given in the question):
    
-	a) mut_cond.h contains an algorithm using mutexes and condition_variables. These are c++11 features. The algorithm ends up running sequantially for the most part.
+	a) mut_cond.h contains an algorithm using mutexes and condition_variables. These are c++11 features. The algorithm ends up running sequentially for the most part.
 
 	b) sema.h contains an algorithm using semaphores (c++20) where the critical section is divided into two parts. This is already faster than mut_cond.h (about 8 times faster, timed with the system clock and 100,000 loops for each thread).
   
