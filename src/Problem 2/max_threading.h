@@ -56,11 +56,11 @@ namespace max_threading
     }    
 
     std::binary_semaphore print_sema(1);
-    void critical_print(int index)
+    void critical_print(int thread_ID)
     {
         std::string subs;
         int count = 0;
-        int pos = max_threading::next_start_index[index];
+        int pos = max_threading::next_start_index[thread_ID];
         while (count<char_count)
         {
             subs+=max_threading::main_string[pos%max_threading::string_size];
@@ -71,34 +71,34 @@ namespace max_threading
         std::cout<<subs<<std::endl;
     }
 
-    void index_update(int index)
+    void index_update(int thread_ID)
     {
-        if(!max_threading::index_is_updated[index])
+        if(!max_threading::index_is_updated[thread_ID])
         {            
-            max_threading::next_start_index[index] = (max_threading::next_start_index[index]+(max_threading::thread_count*max_threading::char_count))%max_threading::string_size;
-            //std::cout<<"Updating index for thread "<<index<<" to "<<max_threading::next_start_index[index]<<std::endl;
-            max_threading::index_is_updated[index] = true;
+            max_threading::next_start_index[thread_ID] = (max_threading::next_start_index[thread_ID]+(max_threading::thread_count*max_threading::char_count))%max_threading::string_size;
+            //std::cout<<"Updating index for thread "<<thread_ID<<" to "<<max_threading::next_start_index[index]<<std::endl;
+            max_threading::index_is_updated[thread_ID] = true;
         }        
     }
 
-    void thread_runner(int index)
+    void thread_runner(int thread_ID)
     {
         int count=0;
         while(count++<num_loops)
         {
             //Tries to update index and prepare to extract next substring assigned to it:
-            max_threading::index_update(index);
+            max_threading::index_update(thread_ID);
 
-            if(max_threading::print_allowed[index] && max_threading::index_is_updated[index])
+            if(max_threading::print_allowed[thread_ID] && max_threading::index_is_updated[thread_ID])
             {
                 //std::cout<<"Print allowed for thread "<<index<<std::endl;
                 max_threading::print_sema.acquire();
-                max_threading::critical_print(index);
-                max_threading::print_allowed[index]=false;
-                max_threading::print_allowed[(index+1)%max_threading::thread_count]=true;//for sequential printing
+                max_threading::critical_print(thread_ID);
+                max_threading::print_allowed[thread_ID]=false;
+                max_threading::print_allowed[(thread_ID+1)%max_threading::thread_count]=true;//for sequential printing
                 
                 //max_threading::index_update_sema[index].release();
-                max_threading::index_is_updated[index] = false;
+                max_threading::index_is_updated[thread_ID] = false;
                 max_threading::print_sema.release();
             }
         }
