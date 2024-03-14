@@ -26,3 +26,5 @@ Notes:
 	b) The time complexity of sema.h is less than O(N). It increases about ~3x if number of loops is increased 10x. This suggests it might be of the order of O(log(N)).
 
 	c) The time complexity of max_threading.h is again about O(N) where N is the number of loops each thread has to run for (10x increase when N is increased by 10x). However, it is still much faster than both the other algorithms for number of loops of the order of ~1,000,000. For loops exceeding 10,000,000 in number, sema.h might be faster since it grows logarithmically in time.
+
+5. The algorithm called max_threading seems to be perfectly starvation-free, as the total time it takes to run only depends on the length of substring that needs to be printed, and it indeed gets faster if more threads are made available. The lower limit to the amount of time required here is set by the std::cout statements only.
