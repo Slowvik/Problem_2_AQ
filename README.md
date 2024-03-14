@@ -29,4 +29,4 @@ Notes:
 
 5. The algorithm called max_threading seems to be perfectly starvation-free, as the total time it takes to run only depends on the length of substring that needs to be printed, and it indeed gets faster if more threads are made available. The lower limit to the amount of time required here is set by the std::cout statements only.
 
-6. Possible improvements: Comprehensive testing on "sema" and "max_threading" using different substring lengths, number of cores and loops per thread is required to fully understand the time complexity of the solution.
+6. Possible improvements: Comprehensive testing on "sema" and "max_threading" using different substring lengths, number of threads and loops per thread is required to fully understand the time complexity of the solution.
