@@ -31,9 +31,9 @@ namespace seq
         {
             subs = "";
 
-            for(int i = pos; i<(pos+char_count)%main_string_length; i++)
-            {
-                subs += main_string[i];
+            for(int i = pos; i<char_count; i++)
+            {                
+                subs += main_string[(pos+i)%main_string_length];
             }
 
             pos = (pos+char_count)%main_string_length;
