@@ -46,6 +46,8 @@ int main(int argc, char* argv[])
     std::vector<std::thread> thread_vector_sema;
     std::vector<std::thread> thread_vector_max_threading;
 
+
+    //Baseline: Time taken to print sequentially
     auto start_time_seq = std::chrono::high_resolution_clock::now();
     seq::print_seq();
     auto end_time_seq = std::chrono::high_resolution_clock::now();
