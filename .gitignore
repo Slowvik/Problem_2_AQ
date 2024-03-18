@@ -1,4 +1,7 @@
 *.exe
-/.vscode/*
+*/.vscode/*
 /build/*
 Tester.cpp
+*/Random tester/*
+/src/Problem 2/Random tester
+/.vscode

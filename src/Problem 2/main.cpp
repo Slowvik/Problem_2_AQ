@@ -2,7 +2,7 @@
 
 */
 
-#include "mut_cond.h"
+#include "sequential.h"
 #include "sema.h"
 #include "max_threading.h"
 #include <iostream>
@@ -37,28 +37,18 @@ int main(int argc, char* argv[])
     }
 
     //Initialising the different algorithms
-    mut_cond::init(s, c_count, t_count, n_loops);
+    seq::init(s, c_count, n_loops);
     sema::init(s, c_count, t_count, n_loops);
     max_threading::init(s, c_count, t_count, n_loops);
 
 
     //vector of threads
-    std::vector<std::thread> thread_vector_mut_cond;
     std::vector<std::thread> thread_vector_sema;
     std::vector<std::thread> thread_vector_max_threading;
 
-    //create the threads and time them for 1000 loops each
-    auto startTimeMutCond = std::chrono::high_resolution_clock::now();
-    for(int i = 0; i<t_count;i++)
-    {
-        std::thread th(mut_cond::thread_runner, i); //running code with mutex and cv       
-        thread_vector_mut_cond.push_back(move(th)); //Copy constructor of std::thread is deleted, have to use move() instead
-    }
-    for(int i = 0; i<t_count; i++)
-    {
-        thread_vector_mut_cond[i].join();
-    }
-    auto endTimeMutCond = std::chrono::high_resolution_clock::now();
+    auto start_time_seq = std::chrono::high_resolution_clock::now();
+    seq::print_seq();
+    auto end_time_seq = std::chrono::high_resolution_clock::now();
     
 
     auto startTimeSema = std::chrono::high_resolution_clock::now();
@@ -87,7 +77,7 @@ int main(int argc, char* argv[])
 
     std::cout<<"\n\n\n\n";
 
-    std::cout<<"Time taken by mut_cond is "<<std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(endTimeMutCond - startTimeMutCond).count()<<" milliseconds"<<std::endl;
+    std::cout<<"Time taken for sequential printing without threading is "<<std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(end_time_seq - start_time_seq).count()<<" milliseconds"<<std::endl;
     std::cout<<"Time taken by sema is "<<std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(endTimeSema - startTimeSema).count()<<" milliseconds"<<std::endl;
     std::cout<<"Time taken by max_threading is "<<std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(endTimeMaxThreading - startTimeMaxThreading).count()<<" milliseconds"<<std::endl;
 
