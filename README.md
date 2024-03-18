@@ -1,4 +1,5 @@
 MINIMUM C++ VERSION REQUIRED: C++20
+
 Compile with:
 1. On windows: g++ -std=c++20 main.cpp -o myprinter
 2. For linux, CMakeLists.txt needs to be updated with proper C++ version (C++20)
