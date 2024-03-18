@@ -7,7 +7,7 @@ Compile with:
 Notes:
 1. 3 different algorithms are presented as follows (all called with the sample given in the question):
    
-	a) mut_cond.h contains an algorithm using mutexes and condition_variables. These are c++11 features. The algorithm ends up running sequentially for the most part.
+	a) sequential.h contains an algorithm that prints substrings sequentially without multithreading.
 
 	b) sema.h contains an algorithm using semaphores (c++20) where the critical section is divided into two parts. This is already faster than mut_cond.h (about 8 times faster, timed with the system clock and 100,000 loops for each thread).
   
@@ -21,12 +21,12 @@ Notes:
 
 4. When tested with different loop sizes, the following conclusions were made:
 
-	a) The time complexity of mut_cond.h increases linearly (O(N)) with number of loops as N (it takes ~10x longer if it runs 10x more times).
+	a) Sequential priniting takes the longest time in all tests.
 
 	b) The time complexity of sema.h is less than O(N). It increases about ~3x if number of loops is increased 10x. This suggests it might be of the order of O(log(N)).
 
 	c) The time complexity of max_threading.h is again about O(N) where N is the number of loops each thread has to run for (10x increase when N is increased by 10x). However, it is still much faster than both the other algorithms for number of loops of the order of ~1,000,000. For loops exceeding 10,000,000 in number, sema.h might be faster since it grows logarithmically in time.
 
-5. The algorithm called max_threading seems to be perfectly starvation-free, as the total time it takes to run only depends on the length of substring that needs to be printed, and it indeed gets faster if more threads are made available. The lower limit to the amount of time required here is set by the std::cout statements only.
+5. The algorithm called max_threading seems to be perfectly starvation-free, as the total time it takes to run only depends on the length of substring that needs to be printed, and it indeed gets faster if more threads are made available. The lower limit to the amount of time required here is set by the std::cout statements only. It is also guaranteed that every substring will be printed n_loops number of times, since we use a blocking call (.aquire()) to acquire the print semaphore.
 
-6. Possible improvements: Comprehensive testing on "sema" and "max_threading" using different substring lengths, number of threads and loops per thread is required to fully understand the time complexity of the solution.
+6. A solution involving max_threading but maintaining a queue of substrings for each thread to print takes much longer than basic max_threading. This is probably because of the push and pop times of the queue adding overheads.
