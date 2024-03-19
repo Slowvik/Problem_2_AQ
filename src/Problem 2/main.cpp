@@ -1,7 +1,3 @@
-/*
-
-*/
-
 #include "sequential.h"
 #include "sema.h"
 #include "max_threading.h"
@@ -41,22 +37,20 @@ int main(int argc, char* argv[])
     sema::init(s, c_count, t_count, n_loops);
     max_threading::init(s, c_count, t_count, n_loops);
 
-
     //vector of threads
     std::vector<std::thread> thread_vector_sema;
     std::vector<std::thread> thread_vector_max_threading;
 
-
-    //Baseline: Time taken to print sequentially
+    //Baseline: Time taken to print sequentially:
     auto start_time_seq = std::chrono::high_resolution_clock::now();
     seq::print_seq();
-    auto end_time_seq = std::chrono::high_resolution_clock::now();
-    
+    auto end_time_seq = std::chrono::high_resolution_clock::now(); 
 
+    //Time taken by sema.h:
     auto startTimeSema = std::chrono::high_resolution_clock::now();
     for(int i = 0; i<t_count;i++)
     {
-        std::thread th(sema::thread_runner, i); //running code with semaphore
+        std::thread th(sema::threadRunner, i); //running code with semaphore
         thread_vector_sema.push_back(move(th)); //Copy constructor of std::thread is deleted, have to use move() instead
     }
     for(int i = 0; i<t_count; i++)
@@ -65,10 +59,11 @@ int main(int argc, char* argv[])
     }
     auto endTimeSema = std::chrono::high_resolution_clock::now();
     
+    //Time taken by max_threading:
     auto startTimeMaxThreading = std::chrono::high_resolution_clock::now();
     for(int i = 0; i<t_count;i++)
     {
-        std::thread th(max_threading::thread_runner, i);//running code with max_threading
+        std::thread th(max_threading::threadRunner, i);//running code with max_threading
         thread_vector_max_threading.push_back(move(th)); //Copy constructor of std::thread is deleted, have to use move() instead
     }
     for(int i = 0; i<t_count; i++)
