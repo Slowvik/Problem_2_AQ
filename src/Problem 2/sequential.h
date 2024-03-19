@@ -3,41 +3,41 @@
 
 namespace seq
 {
-    std::string main_string;
-    int main_string_length;
-    int char_count;
-    int num_loops;
-    int start_pos;
-    std::string subs;
-    int pos;
+    std::string _main_string;
+    int _main_string_length;
+    int _char_count;
+    int _num_loops;
+    int _start__pos;
+    std::string _subs;
+    int _pos;
 
 
     void init(std::string s, int c_count, int n_loops)
     {
-        main_string = s;
-        main_string_length = s.length();
-        char_count = c_count;
-        num_loops = n_loops;
+        _main_string = s;
+        _main_string_length = s.length();
+        _char_count = c_count;
+        _num_loops = n_loops;
 
-        pos = 0;
-        subs = "";
+        _pos = 0;
+        _subs = "";
 
     }
 
-    void print_seq()
+    void printSeq()
     {
         int count = 0;
-        while(count++<num_loops)
+        while(count++<_num_loops)
         {
-            subs = "";
+            _subs = "";
 
-            for(int i = 0; i<char_count; i++)
+            for(int i = 0; i<_char_count; i++)
             {                
-                subs += main_string[(pos+i)%main_string_length];
+                _subs += _main_string[(_pos+i)%_main_string_length];
             }
 
-            pos = (pos+char_count)%main_string_length;
-            std::cout<<subs<<std::endl;
+            _pos = (_pos+_char_count)%_main_string_length;
+            std::cout<<_subs<<std::endl;
         }
     }
 }

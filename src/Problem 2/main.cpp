@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 
     //Baseline: Time taken to print sequentially:
     auto start_time_seq = std::chrono::high_resolution_clock::now();
-    seq::print_seq();
+    seq::printSeq();
     auto end_time_seq = std::chrono::high_resolution_clock::now(); 
 
     //Time taken by sema.h:
