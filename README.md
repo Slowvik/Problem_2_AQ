@@ -1,4 +1,4 @@
-MINIMUM C++ VERSION REQUIRED: C++20
+Project was originally written in VSCode 1.87.0, compiled and run on Windows 10 with g++12.2.0. Minimum C++ version required: C++11.
 
 Compile with:
 1. On windows: g++ -std=c++20 main.cpp -o myprinter
